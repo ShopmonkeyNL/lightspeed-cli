@@ -1,0 +1,18 @@
+{
+    "name": "davytimmers/lightspeed-cli",
+    "autoload": {
+        "psr-4": {
+            "Davytimmers\\LightspeedCli\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "davyshopmonkey",
+            "email": "davy@shopmonkey.nl"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "symfony/console": "^5.0|^6.0"
+    }
+}
