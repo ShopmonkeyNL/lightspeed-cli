@@ -6,7 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Davytimmers\LightspeedCli\Services\InputOutput;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Davytimmers\LightspeedCli\Services\SettingsService;
 
 class Pull extends Command
 {
@@ -34,17 +34,196 @@ class Pull extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
 
-
-        // $output->writeln('Bestand aanmaken in huidige map...');
-        // $bestandsnaam = getcwd() . '/mijn_bestand.txt';
-        // file_put_contents($bestandsnaam, 'Dit is de inhoud van mijn bestand.');
-        // $output->writeln('Bestand aangemaakt: ' . $bestandsnaam);
-        
         $io = new InputOutput($input, $output);
-        $answer = $io->question('Kunt u antwoord geven?');
-        $io->wrong('Er ging iets mis.');
-        $io->right(sprintf('Het gegeven antwoord is: %s', $answer));
-        
+        $settingsService = new SettingsService();
+        $settings = $settingsService->get($input, $output);
+
+        $availableToPull = $this->availableToPull($settings);
+        if (!$availableToPull) {
+            $io->wrong('Seems like you have to log in again.');
+            $settings = $settingsService->update($input, $output);
+            $this->execute($input, $output);
+            return false;
+        }
+
+        $this->deleteThemeFilesLocal();
+
+        $templates = $this->getTemplates($settings);
+        foreach($templates as $template) {
+            $this->saveTemplate($template);
+        }
+        $assets = $this->getAssets($settings);
+        foreach($assets as $assets) {
+            $this->saveAsset($assets);
+        }
+
+        $io->right("Theme pulled successfuly from '". $settings['shop_url'] ."'.");
+
+        // TODO: pull settings
+        // TODO: pull settings data
+
         return Command::SUCCESS;
     }
+
+    private function getTemplates($settings) {
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => $settings['shop_url'].'admin/themes/'.$settings['theme_id'].'/templates.json',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+            'Accept: application/json, text/plain, */*',
+            'Content-Type: application/json;charset=UTF-8',
+            'Sec-Fetch-Dest: empty',
+            'Sec-Fetch-Mode: cors',
+            'Sec-Fetch-Site: same-origin',
+            'x-csrf-token: '.$settings['csrf'],
+            'Cookie: shared_session_id='.$settings['backend_session_id'].'; backend_session_id='.$settings['backend_session_id'].'; request_method=GET'
+        ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $response = json_decode($response, true);
+
+        return $response['theme_templates'];
+
+    }
+
+    private function getAssets($settings) {
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => $settings['shop_url'].'admin/themes/'.$settings['theme_id'].'/assets.json',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+            'Accept: application/json, text/plain, */*',
+            'Content-Type: application/json;charset=UTF-8',
+            'Sec-Fetch-Dest: empty',
+            'Sec-Fetch-Mode: cors',
+            'Sec-Fetch-Site: same-origin',
+            'x-csrf-token: '.$settings['csrf'],
+            'Cookie: shared_session_id='.$settings['backend_session_id'].'; backend_session_id='.$settings['backend_session_id'].'; request_method=GET'
+        ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $response = json_decode($response, true);
+
+        return $response['theme_assets'];
+
+    }
+
+    private function saveTemplate($template) {
+        $base = getcwd().'/';
+        $parts = pathinfo($template['key']);
+        if (!is_dir($base . $parts['dirname'])) {
+            mkdir($base . $parts['dirname'], 0755, true);
+        }
+        $fullPath = $base . $parts['dirname'] . '/' . $parts['basename'];
+        file_put_contents($fullPath, $template['content']);
+        echo "Loaded: ".$template['key']."\n";
+    }
+
+    private function saveAsset($asset) {
+        if (!in_array($asset['extension'], ['png', 'jpg', 'jpeg', 'woff', 'woff2', 'ttf'])) {
+            $base = getcwd().'/';
+            $parts = pathinfo($asset['key']);
+            if (!is_dir($base . $parts['dirname'])) {
+                mkdir($base . $parts['dirname'], 0755, true);
+            }
+            $fullPath = $base . $parts['dirname'] . '/' . $parts['basename'];
+            file_put_contents($fullPath, file_get_contents($asset['src']));
+            echo "Loaded: ".$asset['key']."\n";
+        }
+    }
+
+    private function availableToPull($settings) {
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => $settings['shop_url'].'admin/themes/'.$settings['theme_id'].'/templates.json',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+            'Accept: application/json, text/plain, */*',
+            'Content-Type: application/json;charset=UTF-8',
+            'Sec-Fetch-Dest: empty',
+            'Sec-Fetch-Mode: cors',
+            'Sec-Fetch-Site: same-origin',
+            'x-csrf-token: '.$settings['csrf'],
+            'Cookie: shared_session_id='.$settings['backend_session_id'].'; backend_session_id='.$settings['backend_session_id'].'; request_method=GET'
+        ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        // $response = json_decode($response, true);
+
+        if (!$response) {
+            return false;
+        } else {
+            $response = json_decode($response, true);
+            if (isset($response['error'])) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+    }
+
+    private function deleteThemeFilesLocal() {
+
+        $dirs = ['/assets', '/layouts', '/pages', '/snippets'];
+
+        foreach($dirs as $dir) {
+            $dir = getcwd().$dir;
+            if (is_dir($dir)) {
+                // return false; // Als het geen map is, kunnen we niets doen
+        
+            $files = array_diff(scandir($dir), array('.', '..'));
+        
+            foreach ($files as $file) {
+                $path = $dir . '/' . $file;
+        
+                if (is_dir($path)) {
+                    // Als het een submap is, roepen we deze functie opnieuw aan om deze te verwijderen
+                    deleteDirectory($path);
+                } else {
+                    // Anders verwijderen we het bestand
+                    unlink($path);
+                }
+            }
+        
+            // Verwijder de lege map zelf
+            rmdir($dir);
+            }
+        }
+    }
+
 }
