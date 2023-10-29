@@ -34,7 +34,9 @@ class Watch extends Command
         // $output = null;
         // exec('gulp watch', $output);
         // echo $output;
-        passthru('gulp watch');
+        $command = 'gulp watch';
+        passthru("{$command} 2>&1");
+        // passthru('gulp watch');
         return Command::SUCCESS;
     }
 
