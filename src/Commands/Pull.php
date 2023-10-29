@@ -38,6 +38,8 @@ class Pull extends Command
         $settingsService = new SettingsService();
         $settings = $settingsService->get($input, $output);
 
+        $this->installWatcherFiles();
+
         $availableToPull = $this->availableToPull($settings);
         if (!$availableToPull) {
             $io->wrong('Seems like you have to log in again.');
@@ -63,6 +65,23 @@ class Pull extends Command
         // TODO: pull settings data
 
         return Command::SUCCESS;
+    }
+
+    private function installWatcherFiles() {
+
+        $oldDir = __DIR__.'/../WatcherFiles/';
+        $oldWatcher = $oldDir . 'filewatcher.php';
+        $newWatcher = getcwd().'/.functions/filewatcher.php';
+        $oldGulpFile = $oldDir . 'gulpfile.js';
+        $newGulpFile = getcwd().'/gulpfile.js';
+        
+        if (!is_dir(getcwd().'/.functions')) {
+            mkdir((getcwd().'/.functions'), 0755, true);
+        }
+
+        copy($oldWatcher, $newWatcher);
+        copy($oldGulpFile, $newGulpFile);
+
     }
 
     private function getTemplates($settings) {

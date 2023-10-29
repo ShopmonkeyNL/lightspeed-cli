@@ -33,7 +33,7 @@ class Watch extends Command
     {
 
         exec('gulp watch');
-        // return Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
 }
