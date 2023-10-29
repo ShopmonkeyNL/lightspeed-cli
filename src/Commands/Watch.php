@@ -32,7 +32,8 @@ class Watch extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
 
-        exec('gulp watch');
+        $output = exec('gulp watch');
+        echo $output;
         return Command::SUCCESS;
     }
 
