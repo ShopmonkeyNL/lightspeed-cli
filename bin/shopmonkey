@@ -10,9 +10,11 @@
     require sprintf('%s/vendor/autoload.php', $root);
 
     use Davytimmers\LightspeedCli\Commands\Pull;
+    use Davytimmers\LightspeedCli\Commands\Watch;
     use Symfony\Component\Console\Application;
 
     $application = new Application();
 
     $application->add(new Pull());
+    $application->add(new Watch());
     $application->run();
