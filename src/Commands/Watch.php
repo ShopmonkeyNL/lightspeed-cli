@@ -31,9 +31,10 @@ class Watch extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output = null;
-        exec('gulp watch', $output);
-        echo $output;
+        // $output = null;
+        // exec('gulp watch', $output);
+        // echo $output;
+        passthru($cmd);
         return Command::SUCCESS;
     }
 
