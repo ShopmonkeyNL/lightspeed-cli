@@ -19,6 +19,6 @@
         "symfony/console": "^5.0|^6.0"
     },
     "bin": [
-        "bin/demo"
+        "bin/shopmonkey"
     ]
 }
