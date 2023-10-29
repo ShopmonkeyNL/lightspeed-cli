@@ -20,5 +20,8 @@
     },
     "bin": [
         "bin/shopmonkey"
-    ]
+    ],
+    "scripts": {
+        "watch": "gulp watch"
+    }
 }
