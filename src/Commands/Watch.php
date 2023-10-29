@@ -31,34 +31,9 @@ class Watch extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
-        $command = 'gulp watch';
-        $descriptorspec = array(
-            0 => array('pipe', 'r'), // Standaard invoer
-            1 => array('pipe', 'w'), // Standaard uitvoer
-            2 => array('pipe', 'w')  // Standaard fout
-        );
-
-        $process = proc_open($command, $descriptorspec, $pipes);
-
-        if (is_resource($process)) {
-            stream_set_blocking($pipes[1], 0); // Zorg ervoor dat de uitvoer niet gebufferd wordt
-
-            while (!feof($pipes[1])) {
-                $output = fgets($pipes[1]);
-                echo $output;
-                ob_flush();
-                flush();
-            }
-
-            fclose($pipes[0]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-            proc_close($process);
-        }
-
-        // $output = exec('gulp watch');
-        // echo $output;
+        $output = null;
+        exec('gulp watch', $output);
+        echo $output;
         return Command::SUCCESS;
     }
 
