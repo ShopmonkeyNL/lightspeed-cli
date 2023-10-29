@@ -22,7 +22,7 @@ class SettingsService
             $settings = json_decode($settings,true); 
             return $settings;
         } else {
-            return $this->create($input, $output, $file);
+            return $this->create($input, $output);
         }
 
     }
@@ -47,9 +47,10 @@ class SettingsService
 
     }
 
-    private function create(InputInterface $input, OutputInterface $output, $file) {
+    public function create($input, $output) {
 
         $io = new InputOutput($input, $output);
+        $file = $this->file;
         $shop_url = $io->question('Enter shop URL');
         $theme_id = $io->question('Enter theme ID');
         $csrf = $io->question('Enter current CSRF token');
@@ -65,6 +66,48 @@ class SettingsService
         file_put_contents($file, json_encode($settings, JSON_PRETTY_PRINT));
 
         return $settings;
+
+    }
+
+    public function authenticate($settings) {
+        
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => $settings['shop_url'].'admin/themes/'.$settings['theme_id'].'/templates.json',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        CURLOPT_HTTPHEADER => array(
+            'Accept: application/json, text/plain, */*',
+            'Content-Type: application/json;charset=UTF-8',
+            'Sec-Fetch-Dest: empty',
+            'Sec-Fetch-Mode: cors',
+            'Sec-Fetch-Site: same-origin',
+            'x-csrf-token: '.$settings['csrf'],
+            'Cookie: shared_session_id='.$settings['backend_session_id'].'; backend_session_id='.$settings['backend_session_id'].'; request_method=GET'
+        ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        // $response = json_decode($response, true);
+
+        if (!$response) {
+            return false;
+        } else {
+            $response = json_decode($response, true);
+            if (isset($response['error'])) {
+                return false;
+            } else {
+                return true;
+            }
+        }
 
     }
 

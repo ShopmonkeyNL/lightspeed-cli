@@ -29,4 +29,9 @@ class InputOutput extends SymfonyStyle
     {
         $this->block(sprintf(' 😮  %s', $message), null, 'fg=white;bg=red', ' ', true);
     }
+
+    public function info($message): void
+    {
+        $this->block($message, null, 'fg=white;bg=blue', ' ', true);
+    }
 }
