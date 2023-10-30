@@ -76,7 +76,7 @@ class Pull extends Command
         $oldGulpFile = $oldDir . 'gulpfile.js';
         $newGulpFile = getcwd() . '/gulpfile.js';
 
-        passthru('npm init -y && npm install gulp gulp-exec gulp-watch && npm install -g gulp-cli');
+        passthru('npm install gulp gulp-exec gulp-watch && npm install -g gulp-cli');
 
         if (!is_dir(getcwd() . '/.functions')) {
             mkdir((getcwd() . '/.functions'), 0755, true);
