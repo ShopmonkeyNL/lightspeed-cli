@@ -34,9 +34,9 @@ class Pull extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
 
-        $io = new InputOutput($input, $output);
+        $io              = new InputOutput($input, $output);
         $settingsService = new SettingsService();
-        $settings = $settingsService->get($input, $output);
+        $settings        = $settingsService->get($input, $output);
 
         $this->installWatcherFiles();
 
@@ -51,15 +51,15 @@ class Pull extends Command
         $this->deleteThemeFilesLocal();
 
         $templates = $this->getTemplates($settings);
-        foreach($templates as $template) {
+        foreach ($templates as $template) {
             $this->saveTemplate($template);
         }
         $assets = $this->getAssets($settings);
-        foreach($assets as $assets) {
+        foreach ($assets as $assets) {
             $this->saveAsset($assets);
         }
 
-        $io->right("Theme pulled successfuly from '". $settings['shop_url'] ."'.");
+        $io->right("Theme pulled successfuly from '" . $settings['shop_url'] . "'.");
 
         // TODO: pull settings
         // TODO: pull settings data
@@ -67,16 +67,19 @@ class Pull extends Command
         return Command::SUCCESS;
     }
 
-    private function installWatcherFiles() {
+    private function installWatcherFiles()
+    {
 
-        $oldDir = __DIR__.'/../WatcherFiles/';
-        $oldWatcher = $oldDir . 'filewatcher.php';
-        $newWatcher = getcwd().'/.functions/filewatcher.php';
+        $oldDir      = __DIR__ . '/../WatcherFiles/';
+        $oldWatcher  = $oldDir . 'filewatcher.php';
+        $newWatcher  = getcwd() . '/.functions/filewatcher.php';
         $oldGulpFile = $oldDir . 'gulpfile.js';
-        $newGulpFile = getcwd().'/gulpfile.js';
-        
-        if (!is_dir(getcwd().'/.functions')) {
-            mkdir((getcwd().'/.functions'), 0755, true);
+        $newGulpFile = getcwd() . '/gulpfile.js';
+
+        passthru('npm init -y && npm install gulp gulp-exec gulp-watch && npm install -g gulp-cli');
+
+        if (!is_dir(getcwd() . '/.functions')) {
+            mkdir((getcwd() . '/.functions'), 0755, true);
         }
 
         copy($oldWatcher, $newWatcher);
@@ -84,28 +87,29 @@ class Pull extends Command
 
     }
 
-    private function getTemplates($settings) {
+    private function getTemplates($settings)
+    {
 
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-        CURLOPT_URL => $settings['shop_url'].'admin/themes/'.$settings['theme_id'].'/templates.json',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'GET',
-        CURLOPT_HTTPHEADER => array(
-            'Accept: application/json, text/plain, */*',
-            'Content-Type: application/json;charset=UTF-8',
-            'Sec-Fetch-Dest: empty',
-            'Sec-Fetch-Mode: cors',
-            'Sec-Fetch-Site: same-origin',
-            'x-csrf-token: '.$settings['csrf'],
-            'Cookie: shared_session_id='.$settings['backend_session_id'].'; backend_session_id='.$settings['backend_session_id'].'; request_method=GET'
-        ),
+            CURLOPT_URL            => $settings['shop_url'] . 'admin/themes/' . $settings['theme_id'] . '/templates.json',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => '',
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_TIMEOUT        => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => 'GET',
+            CURLOPT_HTTPHEADER     => array(
+                'Accept: application/json, text/plain, */*',
+                'Content-Type: application/json;charset=UTF-8',
+                'Sec-Fetch-Dest: empty',
+                'Sec-Fetch-Mode: cors',
+                'Sec-Fetch-Site: same-origin',
+                'x-csrf-token: ' . $settings['csrf'],
+                'Cookie: shared_session_id=' . $settings['backend_session_id'] . '; backend_session_id=' . $settings['backend_session_id'] . '; request_method=GET'
+            ),
         ));
 
         $response = curl_exec($curl);
@@ -117,28 +121,29 @@ class Pull extends Command
 
     }
 
-    private function getAssets($settings) {
+    private function getAssets($settings)
+    {
 
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-        CURLOPT_URL => $settings['shop_url'].'admin/themes/'.$settings['theme_id'].'/assets.json',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'GET',
-        CURLOPT_HTTPHEADER => array(
-            'Accept: application/json, text/plain, */*',
-            'Content-Type: application/json;charset=UTF-8',
-            'Sec-Fetch-Dest: empty',
-            'Sec-Fetch-Mode: cors',
-            'Sec-Fetch-Site: same-origin',
-            'x-csrf-token: '.$settings['csrf'],
-            'Cookie: shared_session_id='.$settings['backend_session_id'].'; backend_session_id='.$settings['backend_session_id'].'; request_method=GET'
-        ),
+            CURLOPT_URL            => $settings['shop_url'] . 'admin/themes/' . $settings['theme_id'] . '/assets.json',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => '',
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_TIMEOUT        => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => 'GET',
+            CURLOPT_HTTPHEADER     => array(
+                'Accept: application/json, text/plain, */*',
+                'Content-Type: application/json;charset=UTF-8',
+                'Sec-Fetch-Dest: empty',
+                'Sec-Fetch-Mode: cors',
+                'Sec-Fetch-Site: same-origin',
+                'x-csrf-token: ' . $settings['csrf'],
+                'Cookie: shared_session_id=' . $settings['backend_session_id'] . '; backend_session_id=' . $settings['backend_session_id'] . '; request_method=GET'
+            ),
         ));
 
         $response = curl_exec($curl);
@@ -150,52 +155,55 @@ class Pull extends Command
 
     }
 
-    private function saveTemplate($template) {
-        $base = getcwd().'/';
+    private function saveTemplate($template)
+    {
+        $base  = getcwd() . '/';
         $parts = pathinfo($template['key']);
         if (!is_dir($base . $parts['dirname'])) {
             mkdir($base . $parts['dirname'], 0755, true);
         }
         $fullPath = $base . $parts['dirname'] . '/' . $parts['basename'];
         file_put_contents($fullPath, $template['content']);
-        echo "Loaded: ".$template['key']."\n";
+        echo "Loaded: " . $template['key'] . "\n";
     }
 
-    private function saveAsset($asset) {
+    private function saveAsset($asset)
+    {
         if (!in_array($asset['extension'], ['png', 'jpg', 'jpeg', 'woff', 'woff2', 'ttf'])) {
-            $base = getcwd().'/';
+            $base  = getcwd() . '/';
             $parts = pathinfo($asset['key']);
             if (!is_dir($base . $parts['dirname'])) {
                 mkdir($base . $parts['dirname'], 0755, true);
             }
             $fullPath = $base . $parts['dirname'] . '/' . $parts['basename'];
             file_put_contents($fullPath, file_get_contents($asset['src']));
-            echo "Loaded: ".$asset['key']."\n";
+            echo "Loaded: " . $asset['key'] . "\n";
         }
     }
 
-    private function availableToPull($settings) {
+    private function availableToPull($settings)
+    {
 
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-        CURLOPT_URL => $settings['shop_url'].'admin/themes/'.$settings['theme_id'].'/templates.json',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'GET',
-        CURLOPT_HTTPHEADER => array(
-            'Accept: application/json, text/plain, */*',
-            'Content-Type: application/json;charset=UTF-8',
-            'Sec-Fetch-Dest: empty',
-            'Sec-Fetch-Mode: cors',
-            'Sec-Fetch-Site: same-origin',
-            'x-csrf-token: '.$settings['csrf'],
-            'Cookie: shared_session_id='.$settings['backend_session_id'].'; backend_session_id='.$settings['backend_session_id'].'; request_method=GET'
-        ),
+            CURLOPT_URL            => $settings['shop_url'] . 'admin/themes/' . $settings['theme_id'] . '/templates.json',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => '',
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_TIMEOUT        => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => 'GET',
+            CURLOPT_HTTPHEADER     => array(
+                'Accept: application/json, text/plain, */*',
+                'Content-Type: application/json;charset=UTF-8',
+                'Sec-Fetch-Dest: empty',
+                'Sec-Fetch-Mode: cors',
+                'Sec-Fetch-Site: same-origin',
+                'x-csrf-token: ' . $settings['csrf'],
+                'Cookie: shared_session_id=' . $settings['backend_session_id'] . '; backend_session_id=' . $settings['backend_session_id'] . '; request_method=GET'
+            ),
         ));
 
         $response = curl_exec($curl);
@@ -216,31 +224,32 @@ class Pull extends Command
 
     }
 
-    private function deleteThemeFilesLocal() {
+    private function deleteThemeFilesLocal()
+    {
 
         $dirs = ['/assets', '/layouts', '/pages', '/snippets'];
 
-        foreach($dirs as $dir) {
-            $dir = getcwd().$dir;
+        foreach ($dirs as $dir) {
+            $dir = getcwd() . $dir;
             if (is_dir($dir)) {
                 // return false; // Als het geen map is, kunnen we niets doen
-        
-            $files = array_diff(scandir($dir), array('.', '..'));
-        
-            foreach ($files as $file) {
-                $path = $dir . '/' . $file;
-        
-                if (is_dir($path)) {
-                    // Als het een submap is, roepen we deze functie opnieuw aan om deze te verwijderen
-                    deleteDirectory($path);
-                } else {
-                    // Anders verwijderen we het bestand
-                    unlink($path);
+
+                $files = array_diff(scandir($dir), array('.', '..'));
+
+                foreach ($files as $file) {
+                    $path = $dir . '/' . $file;
+
+                    if (is_dir($path)) {
+                        // Als het een submap is, roepen we deze functie opnieuw aan om deze te verwijderen
+                        deleteDirectory($path);
+                    } else {
+                        // Anders verwijderen we het bestand
+                        unlink($path);
+                    }
                 }
-            }
-        
-            // Verwijder de lege map zelf
-            rmdir($dir);
+
+                // Verwijder de lege map zelf
+                rmdir($dir);
             }
         }
     }
