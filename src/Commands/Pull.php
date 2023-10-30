@@ -2,6 +2,7 @@
 
 namespace Davytimmers\LightspeedCli\Commands;
 
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -76,7 +77,7 @@ class Pull extends Command
         $oldGulpFile = $oldDir . 'gulpfile.js';
         $newGulpFile = getcwd() . '/gulpfile.js';
 
-        passthru('npm install gulp gulp-exec gulp-watch && npm install -g gulp-cli');
+        $this->installNodeDependencies();
 
         if (!is_dir(getcwd() . '/.functions')) {
             mkdir((getcwd() . '/.functions'), 0755, true);
@@ -254,4 +255,16 @@ class Pull extends Command
         }
     }
 
+    private function installNodeDependencies()
+    {
+        try {
+            // Install pnpm for faster package management
+            passthru('npm install -g pnpm');
+
+            // Install necessary gulp packages & sass
+            passthru('pnpm install -D gulp gulp-exec gulp-watch gulp-sass sass && pnpm install -g gulp-cli');
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
 }
