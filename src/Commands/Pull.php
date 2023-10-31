@@ -39,7 +39,7 @@ class Pull extends Command
         $settings        = $settingsService->get($input, $output);
 
         $this->installWatcherFiles();
-        $this->addRecommended();
+        $this->addRecommendedExtensions();
 
         $availableToPull = $this->availableToPull($settings);
         if (!$availableToPull) {
@@ -255,7 +255,7 @@ class Pull extends Command
         }
     }
 
-    private function addRecommended()
+    private function addRecommendedExtensions()
     {
         $pathName         = getcwd() . '/.vscode';
         $extensions       = [
