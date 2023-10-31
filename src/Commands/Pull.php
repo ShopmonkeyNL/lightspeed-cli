@@ -71,13 +71,16 @@ class Pull extends Command
     private function installWatcherFiles()
     {
 
-        $oldDir      = __DIR__ . '/../WatcherFiles/';
-        $oldWatcher  = $oldDir . 'filewatcher.php';
-        $newWatcher  = getcwd() . '/.functions/filewatcher.php';
-        $oldGulpFile = $oldDir . 'gulpfile.js';
-        $newGulpFile = getcwd() . '/gulpfile.js';
+        $oldDir        = __DIR__ . '/../WatcherFiles/';
+        $oldWatcher    = $oldDir . 'filewatcher.php';
+        $newWatcher    = getcwd() . '/.functions/filewatcher.php';
+        $oldGulpFile   = $oldDir . 'gulpfile.js';
+        $newGulpFile   = getcwd() . '/gulpfile.js';
+        $oldGulpConfig = $oldDir . 'gulp.config.js';
+        $newGulpConfig = getcwd() . '/gulp.config.js';
 
         $this->installNodeDependencies();
+        $this->createFilesAndFolders();
 
         if (!is_dir(getcwd() . '/.functions')) {
             mkdir((getcwd() . '/.functions'), 0755, true);
@@ -85,6 +88,7 @@ class Pull extends Command
 
         copy($oldWatcher, $newWatcher);
         copy($oldGulpFile, $newGulpFile);
+        copy($oldGulpConfig, $newGulpConfig);
 
     }
 
@@ -262,7 +266,16 @@ class Pull extends Command
             passthru('npm install -g pnpm');
 
             // Install necessary gulp packages & sass
-            passthru('pnpm install -D gulp gulp-exec gulp-watch gulp-sass sass && pnpm install -g gulp-cli');
+            passthru('pnpm install -D gulp gulp-exec gulp-watch gulp-sass gulp-concat gulp-autoprefixer del@6.1.1 gulp-uglifycss gulp-rename sass && pnpm install -g gulp-cli');
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    private function createFilesAndFolders()
+    {
+        try {
+            passthru('touch .gitignore && mkdir src && mkdir src/sass');
         } catch (Exception $e) {
             echo $e->getMessage();
         }
