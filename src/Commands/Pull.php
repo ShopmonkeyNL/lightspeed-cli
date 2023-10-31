@@ -40,6 +40,7 @@ class Pull extends Command
 
         $this->installWatcherFiles();
         $this->addRecommendedExtensions();
+        $this->createPrettierConfig();
 
         $availableToPull = $this->availableToPull($settings);
         if (!$availableToPull) {
@@ -273,9 +274,35 @@ class Pull extends Command
         }
 
         // Create and write extensions json file
-        touch($pathName . '/extensions.json');
+        if (!file_exists($pathName . '/extensions.json')) {
+            touch($pathName . '/extensions.json');
+        }
+
         $extensionsFile = fopen($pathName . '/extensions.json', 'w');
         fwrite($extensionsFile, $extensionsString);
         fclose($extensionsFile);
+    }
+
+    private function createPrettierConfig()
+    {
+        $pathName       = getcwd();
+        $prettierConfig = [
+            'trailingComma'          => 'es5',
+            'tabWidth'               => 2,
+            'semi'                   => true,
+            'singleQuote'            => true,
+            'bracketSpacing'         => true,
+            'bracketSameLine'        => false,
+            'requirePragma'          => true,
+            'singleAttributePerLine' => true,
+        ];
+
+        if (!file_exists($pathName . '/.prettierrc.json')) {
+            touch($pathName . '/.prettierrc.json');
+        }
+
+        $prettierConfigFile = fopen($pathName . '/.prettierrc.json', 'w');
+        fwrite($prettierConfigFile, json_encode($prettierConfig, JSON_PRETTY_PRINT));
+        fclose($prettierConfigFile);
     }
 }
