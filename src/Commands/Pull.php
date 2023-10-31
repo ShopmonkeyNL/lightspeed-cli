@@ -39,6 +39,7 @@ class Pull extends Command
         $settings        = $settingsService->get($input, $output);
 
         $this->installWatcherFiles();
+        $this->addRecommended();
 
         $availableToPull = $this->availableToPull($settings);
         if (!$availableToPull) {
@@ -254,4 +255,27 @@ class Pull extends Command
         }
     }
 
+    private function addRecommended()
+    {
+        $pathName         = getcwd() . '/.vscode';
+        $extensions       = [
+            'recommendations' => [
+                'esbenp.prettier-vscode',
+                'dbaeumer.vscode-eslint',
+                'mblode.twig-language-2',
+                'formulahendry.auto-rename-tag'
+            ]
+        ];
+        $extensionsString = json_encode($extensions, JSON_PRETTY_PRINT);
+
+        if (!is_dir($pathName)) {
+            mkdir(($pathName), 0755, true);
+        }
+
+        // Create and write extensions json file
+        touch($pathName . '/extensions.json');
+        $extensionsFile = fopen($pathName . '/extensions.json', 'w');
+        fwrite($extensionsFile, $extensionsString);
+        fclose($extensionsFile);
+    }
 }
