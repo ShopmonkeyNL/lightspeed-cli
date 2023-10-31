@@ -275,7 +275,8 @@ class Pull extends Command
     private function createFilesAndFolders()
     {
         try {
-            passthru('touch .gitignore && mkdir src && mkdir src/sass');
+            passthru('touch .gitignore && echo "/node_modules\nlightspeed-settings.json" >> .gitignore');
+            passthru('mkdir src && mkdir src/sass &&');
         } catch (Exception $e) {
             echo $e->getMessage();
         }
