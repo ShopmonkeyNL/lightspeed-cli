@@ -309,6 +309,7 @@ class Pull extends Command
         $prettierConfigFile = fopen($pathName . '/.prettierrc.json', 'w');
         fwrite($prettierConfigFile, json_encode($prettierConfig, JSON_PRETTY_PRINT));
         fclose($prettierConfigFile);
+    }
 
     private function installNodeDependencies()
     {
