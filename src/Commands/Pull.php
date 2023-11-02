@@ -264,7 +264,8 @@ class Pull extends Command
             'recommendations' => [
                 'esbenp.prettier-vscode',
                 'dbaeumer.vscode-eslint',
-                'mblode.twig-language-2',
+                'artagnon.vstwig',
+                'whatwedo.twig',
                 'formulahendry.auto-rename-tag'
             ]
         ];
