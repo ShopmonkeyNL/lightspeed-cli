@@ -91,7 +91,6 @@ class Pull extends Command
         copy($oldWatcher, $newWatcher);
         copy($oldGulpFile, $newGulpFile);
         copy($oldGulpConfig, $newGulpConfig);
-
     }
 
     private function getTemplates($settings)
@@ -125,7 +124,6 @@ class Pull extends Command
         $response = json_decode($response, true);
 
         return $response['theme_templates'];
-
     }
 
     private function getAssets($settings)
@@ -159,7 +157,6 @@ class Pull extends Command
         $response = json_decode($response, true);
 
         return $response['theme_assets'];
-
     }
 
     private function saveTemplate($template)
@@ -176,16 +173,16 @@ class Pull extends Command
 
     private function saveAsset($asset)
     {
-        if (!in_array($asset['extension'], ['png', 'jpg', 'jpeg', 'woff', 'woff2', 'ttf'])) {
-            $base  = getcwd() . '/';
-            $parts = pathinfo($asset['key']);
-            if (!is_dir($base . $parts['dirname'])) {
-                mkdir($base . $parts['dirname'], 0755, true);
-            }
-            $fullPath = $base . $parts['dirname'] . '/' . $parts['basename'];
-            file_put_contents($fullPath, file_get_contents($asset['src']));
-            echo "Loaded: " . $asset['key'] . "\n";
+        // if (!in_array($asset['extension'], ['png', 'jpg', 'jpeg', 'woff', 'woff2', 'ttf'])) {
+        $base  = getcwd() . '/';
+        $parts = pathinfo($asset['key']);
+        if (!is_dir($base . $parts['dirname'])) {
+            mkdir($base . $parts['dirname'], 0755, true);
         }
+        $fullPath = $base . $parts['dirname'] . '/' . $parts['basename'];
+        file_put_contents($fullPath, file_get_contents($asset['src']));
+        echo "Loaded: " . $asset['key'] . "\n";
+        // }
     }
 
     private function availableToPull($settings)
@@ -228,7 +225,6 @@ class Pull extends Command
                 return true;
             }
         }
-
     }
 
     private function deleteThemeFilesLocal()
