@@ -91,7 +91,7 @@ class ThemeFiles
       $type = $this->getFileType($settings);
       $fileTitle = explode('.', $file)[0];
       $fileExtensions = explode('.', $file);
-      $fileExtensions = array_shift($fileExtensions);
+      $fileExtensions = array_slice($fileExtensions, 1);
       $fileExtension = implode('.', $fileExtensions);
 
       $send_data = [
