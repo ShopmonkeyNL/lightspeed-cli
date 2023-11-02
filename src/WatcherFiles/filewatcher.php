@@ -89,9 +89,9 @@ class ThemeFiles
 
       $file = basename($settings['path']);
       $type = $this->getFileType($settings);
-      $fileTitle = explode('.', $file)[0];
-      $fileExtensions = explode('.', $file);
-      $fileExtensions = array_slice($fileExtensions, 1);
+      $fileArray = explode(".", $file);
+      $fileTitle = $fileArray[0];
+      $fileExtensions = array_slice($fileArray, 1);
       $fileExtension = implode('.', $fileExtensions);
 
       $send_data = [
