@@ -8,6 +8,8 @@ const rename = require('gulp-rename');
 const sass = require('gulp-sass')(require('sass'));
 const uglifycss = require('gulp-uglifycss');
 const exec = require('gulp-exec');
+const path = require('path');
+const fs = require('fs');
 
 const watcher = watch(['layouts/*.rain', 'pages/*.rain', 'snippets/*.rain', 'assets/*', 'src/**/*']);
 
@@ -51,3 +53,29 @@ gulp.task('sass', () => {
         // .pipe(rename({ suffix: '.min' })) current setup does not allow double file extensions
         .pipe(gulp.dest(config.css.exportPath))
 });
+
+gulp.task('raincs', () => {
+    const altRegex = /<img\b(?![^>]*alt=)[^>]*>/;
+    const currentDirectory = './';
+    const filesAndDirs = fs.readdirSync(currentDirectory);
+    const directories = filesAndDirs.filter(item => {
+      return fs.statSync(path.join(currentDirectory, item)).isDirectory();
+    });
+    
+    directories.forEach(directory => {
+        const rainFiles = fs.readdirSync(path.join(currentDirectory, directory));
+
+        rainFiles.forEach(file => {
+            if (!file.endsWith('.rain') && !file.endsWith('.css.rain')) return;
+
+            const content = fs.readFileSync(`${directory}/${file}`, 'utf-8').split('\n');
+
+            content.forEach((line, index) => {
+                const missingAlt = line.match(altRegex);
+                if (missingAlt) {
+                    console.log(`Missing alt attribute in file ${directory}/${file}:${index + 1}`);
+                }
+            })
+        });
+    });
+})
