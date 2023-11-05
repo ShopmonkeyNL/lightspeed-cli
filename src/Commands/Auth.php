@@ -6,6 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Davytimmers\LightspeedCli\Services\SettingsService;
+use Davytimmers\LightspeedCli\Services\MessageService;
 use Davytimmers\LightspeedCli\Services\InputOutput;
 
 class Auth extends Command
@@ -33,19 +34,9 @@ class Auth extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        
-        $io = new InputOutput($input, $output);
-        $settingsService = new SettingsService();
-        $settings = $settingsService->get($input, $output);
 
-        if (!$settingsService->authenticate($settings)) {
-            $io->wrong("Something went wrong, try again. Check your settings.");
-            $io->info(json_encode($settings, JSON_PRETTY_PRINT));
-            $settingsService->create($input, $output);
-            $this->execute($input, $output);
-        } else {
-            $io->right("Authentication successful for '". $settings['shop_url'] ."'.");
-        }
+        $settingsService = new SettingsService();
+        $settingsService->authenticate($input, $output);
 
         return Command::SUCCESS;
     }

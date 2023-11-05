@@ -1,6 +1,6 @@
 <?php
 
-$settings = file_get_contents(__DIR__ . '/../lightspeed-settings.json');
+$settings = file_get_contents(__DIR__ . '/../config.json');
 $settings = json_decode($settings, true);
 $settings['path'] = $argv[1];
 $settings['trigger'] = $argv[2];

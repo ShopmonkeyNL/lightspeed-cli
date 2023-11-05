@@ -2,12 +2,13 @@
 
 namespace Davytimmers\LightspeedCli\Commands;
 
-use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Davytimmers\LightspeedCli\Services\InputOutput;
 use Davytimmers\LightspeedCli\Services\SettingsService;
+use Davytimmers\LightspeedCli\Services\FileMetadataService;
+use Davytimmers\LightspeedCli\Services\MessageService;
 
 class Pull extends Command
 {
@@ -38,10 +39,7 @@ class Pull extends Command
         $io              = new InputOutput($input, $output);
         $settingsService = new SettingsService();
         $settings        = $settingsService->get($input, $output);
-
-        $this->installWatcherFiles();
-        $this->addRecommendedExtensions();
-        $this->createPrettierConfig();
+        $messageService = new MessageService();
 
         $availableToPull = $this->availableToPull($settings);
         if (!$availableToPull) {
@@ -51,16 +49,23 @@ class Pull extends Command
             return false;
         }
 
-        $this->deleteThemeFilesLocal();
+        $theme_directory  = getcwd() . '/theme';
+        if (!is_dir($theme_directory)) {
+            mkdir($theme_directory, 0755, true);
+        }
 
         $templates = $this->getTemplates($settings);
         foreach ($templates as $template) {
             $this->saveTemplate($template);
         }
         $assets = $this->getAssets($settings);
-        foreach ($assets as $assets) {
-            $this->saveAsset($assets);
+        foreach ($assets as $asset) {
+            $this->saveAsset($asset);
         }
+
+        $this->deleteDeletedFiles($templates, $assets);
+
+        $this->saveThemeSettings($settings);
 
         $io->right("Theme pulled successfuly from '" . $settings['shop_url'] . "'.");
 
@@ -70,27 +75,15 @@ class Pull extends Command
         return Command::SUCCESS;
     }
 
-    private function installWatcherFiles()
-    {
+    private function getThemePath($path) {
 
-        $oldDir        = __DIR__ . '/../WatcherFiles/';
-        $oldWatcher    = $oldDir . 'filewatcher.php';
-        $newWatcher    = getcwd() . '/.functions/filewatcher.php';
-        $oldGulpFile   = $oldDir . 'gulpfile.js';
-        $newGulpFile   = getcwd() . '/gulpfile.js';
-        $oldGulpConfig = $oldDir . 'gulp.config.js';
-        $newGulpConfig = getcwd() . '/gulp.config.js';
+        $path = preg_replace('/^\/+/', '', $path);
+        $path = preg_replace('/\/+$/', '', $path);
 
-        $this->installNodeDependencies();
-        $this->createFilesAndFolders();
+        $base = getcwd() . '/theme/' . $path;
 
-        if (!is_dir(getcwd() . '/.functions')) {
-            mkdir((getcwd() . '/.functions'), 0755, true);
-        }
+        return $base;
 
-        copy($oldWatcher, $newWatcher);
-        copy($oldGulpFile, $newGulpFile);
-        copy($oldGulpConfig, $newGulpConfig);
     }
 
     private function getTemplates($settings)
@@ -124,6 +117,69 @@ class Pull extends Command
         $response = json_decode($response, true);
 
         return $response['theme_templates'];
+    }
+
+    private function saveThemeSettings($settings)
+    {
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL            => $settings['shop_url'] . 'admin/theme/manage/settings.json',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => '',
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_TIMEOUT        => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => 'GET',
+            CURLOPT_HTTPHEADER     => array(
+                'Accept: application/json, text/plain, */*',
+                'Content-Type: application/json;charset=UTF-8',
+                'Sec-Fetch-Dest: empty',
+                'Sec-Fetch-Mode: cors',
+                'Sec-Fetch-Site: same-origin',
+                'x-csrf-token: ' . $settings['csrf'],
+                'Cookie: shared_session_id=' . $settings['backend_session_id'] . '; backend_session_id=' . $settings['backend_session_id'] . '; request_method=GET'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $response = json_decode($response, true);
+
+        file_put_contents($this->getThemePath('settings.json'), json_encode($response['theme_settings'], JSON_PRETTY_PRINT));
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL            => $settings['shop_url'] . 'admin/theme/preview/settings.json',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => '',
+            CURLOPT_MAXREDIRS      => 10,
+            CURLOPT_TIMEOUT        => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST  => 'GET',
+            CURLOPT_HTTPHEADER     => array(
+                'Accept: application/json, text/plain, */*',
+                'Content-Type: application/json;charset=UTF-8',
+                'Sec-Fetch-Dest: empty',
+                'Sec-Fetch-Mode: cors',
+                'Sec-Fetch-Site: same-origin',
+                'x-csrf-token: ' . $settings['csrf'],
+                'Cookie: shared_session_id=' . $settings['backend_session_id'] . '; backend_session_id=' . $settings['backend_session_id'] . '; request_method=GET'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $response = json_decode($response, true);
+
+        file_put_contents($this->getThemePath('settings_data.json'), json_encode($response['theme_settings'], JSON_PRETTY_PRINT));
+
     }
 
     private function getAssets($settings)
@@ -161,28 +217,43 @@ class Pull extends Command
 
     private function saveTemplate($template)
     {
-        $base  = getcwd() . '/';
+        $messageService = new MessageService();
+        $fileMetadataService = new FileMetadataService();
         $parts = pathinfo($template['key']);
-        if (!is_dir($base . $parts['dirname'])) {
-            mkdir($base . $parts['dirname'], 0755, true);
+        if (!is_dir($this->getThemePath($parts['dirname']))) {
+            mkdir($this->getThemePath($parts['dirname']), 0755, true);
         }
-        $fullPath = $base . $parts['dirname'] . '/' . $parts['basename'];
+        $fullPath = $this->getThemePath($parts['dirname'] . '/' . $parts['basename']);
+        $updatedAt = $fileMetadataService->get($template['key']);
+        if (file_exists($fullPath)) {
+            if ($updatedAt == $template['updated_at']) {
+                return false;
+            }
+        } 
+        $fileMetadataService->update($template['key'], $template['updated_at']);
         file_put_contents($fullPath, $template['content']);
-        echo "Loaded: " . $template['key'] . "\n";
+        $messageService->create('Loaded', ($template['key']. ' was loaded.'), 'green');
     }
 
     private function saveAsset($asset)
     {
-        // if (!in_array($asset['extension'], ['png', 'jpg', 'jpeg', 'woff', 'woff2', 'ttf'])) {
-        $base  = getcwd() . '/';
+
+        $messageService = new MessageService();
+        $fileMetadataService = new FileMetadataService();
         $parts = pathinfo($asset['key']);
-        if (!is_dir($base . $parts['dirname'])) {
-            mkdir($base . $parts['dirname'], 0755, true);
+        if (!is_dir($this->getThemePath($parts['dirname']))) {
+            mkdir($this->getThemePath($parts['dirname']), 0755, true);
         }
-        $fullPath = $base . $parts['dirname'] . '/' . $parts['basename'];
+        $fullPath = $this->getThemePath($parts['dirname'] . '/' . $parts['basename']);
+        $updatedAt = $fileMetadataService->get($asset['key']);
+        if (file_exists($fullPath)) {
+            if ($updatedAt == $asset['updated_at']) {
+                return false;
+            }
+        } 
+        $fileMetadataService->update($asset['key'], $asset['updated_at']);
         file_put_contents($fullPath, file_get_contents($asset['src']));
-        echo "Loaded: " . $asset['key'] . "\n";
-        // }
+        $messageService->create('Loaded', ($asset['key']. ' was loaded.'), 'green');
     }
 
     private function availableToPull($settings)
@@ -227,106 +298,34 @@ class Pull extends Command
         }
     }
 
-    private function deleteThemeFilesLocal()
-    {
+    private function deleteDeletedFiles($templates, $assets) {
 
-        $dirs = ['/assets', '/layouts', '/pages', '/snippets'];
-
-        foreach ($dirs as $dir) {
-            $dir = getcwd() . $dir;
-            if (is_dir($dir)) {
-                // return false; // Als het geen map is, kunnen we niets doen
-
-                $files = array_diff(scandir($dir), array('.', '..'));
-
-                foreach ($files as $file) {
-                    $path = $dir . '/' . $file;
-
-                    if (is_dir($path)) {
-                        // Als het een submap is, roepen we deze functie opnieuw aan om deze te verwijderen
-                        deleteDirectory($path);
-                    } else {
-                        // Anders verwijderen we het bestand
-                        unlink($path);
-                    }
-                }
-
-                // Verwijder de lege map zelf
-                rmdir($dir);
+        $messageService = new MessageService();
+        $base  = getcwd();
+        $production_paths = [];
+        foreach ([$templates, $assets] as $items) {
+            foreach ($items as $item) {
+                $production_paths[] = $this->getThemePath($item['key']);
             }
         }
-    }
 
-    private function addRecommendedExtensions()
-    {
-        $pathName         = getcwd() . '/.vscode';
-        $extensions       = [
-            'recommendations' => [
-                'esbenp.prettier-vscode',
-                'dbaeumer.vscode-eslint',
-                'mblode.twig-language-2',
-                'formulahendry.auto-rename-tag'
-            ]
-        ];
-        $extensionsString = json_encode($extensions, JSON_PRETTY_PRINT);
-
-        if (!is_dir($pathName)) {
-            mkdir(($pathName), 0755, true);
+        $local_paths = [];
+        foreach(['layouts', 'pages', 'snippets', 'assets'] as $directory) {
+            $path = $this->getThemePath($directory);
+            $scanned_directory = array_diff(scandir($path), array('..', '.'));
+            foreach ($scanned_directory as $file){
+                $local_paths[] = $path . '/' . $file;
+            }
         }
 
-        // Create and write extensions json file
-        if (!file_exists($pathName . '/extensions.json')) {
-            touch($pathName . '/extensions.json');
+        $deleted_files = array_diff($local_paths, $production_paths);
+        
+        foreach($deleted_files as $file) {
+            unlink($file);
+            $messageService->create('Deleted', ($file. ' was deleted.'), 'red');
         }
+        
 
-        $extensionsFile = fopen($pathName . '/extensions.json', 'w');
-        fwrite($extensionsFile, $extensionsString);
-        fclose($extensionsFile);
     }
 
-    private function createPrettierConfig()
-    {
-        $pathName       = getcwd();
-        $prettierConfig = [
-            'trailingComma'          => 'es5',
-            'tabWidth'               => 2,
-            'semi'                   => true,
-            'singleQuote'            => true,
-            'bracketSpacing'         => true,
-            'bracketSameLine'        => false,
-            'requirePragma'          => true,
-            'singleAttributePerLine' => true,
-        ];
-
-        if (!file_exists($pathName . '/.prettierrc.json')) {
-            touch($pathName . '/.prettierrc.json');
-        }
-
-        $prettierConfigFile = fopen($pathName . '/.prettierrc.json', 'w');
-        fwrite($prettierConfigFile, json_encode($prettierConfig, JSON_PRETTY_PRINT));
-        fclose($prettierConfigFile);
-    }
-
-    private function installNodeDependencies()
-    {
-        try {
-            // Install pnpm for faster package management
-            passthru('npm install -g pnpm');
-
-            // Install necessary gulp packages & sass
-            passthru('pnpm install -D gulp gulp-exec gulp-watch gulp-sass gulp-concat gulp-autoprefixer del@6.1.1 gulp-uglifycss gulp-rename sass && pnpm install -g gulp-cli');
-        } catch (Exception $e) {
-            echo $e->getMessage();
-        }
-    }
-
-    private function createFilesAndFolders()
-    {
-        try {
-            passthru('touch .gitignore && echo "/node_modules\nlightspeed-settings.json" >> .gitignore');
-            passthru('mkdir src && mkdir src/sass &&');
-        } catch (Exception $e) {
-            echo $e->getMessage();
-        }
-    }
 }
