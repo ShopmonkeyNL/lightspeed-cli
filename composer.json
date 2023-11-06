@@ -1,5 +1,5 @@
 {
-    "name": "davytimmers/lightspeed-cli",
+    "name": "shopmonkeynl/shopmonkey-cli",
     "type": "library",
     "license": "MIT",
     "autoload": {

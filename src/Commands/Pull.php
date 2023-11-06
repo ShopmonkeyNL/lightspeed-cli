@@ -1,14 +1,14 @@
 <?php
 
-namespace Davytimmers\LightspeedCli\Commands;
+namespace ShopmonkeyNL\ShopmonkeyCli\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Davytimmers\LightspeedCli\Services\InputOutput;
-use Davytimmers\LightspeedCli\Services\SettingsService;
-use Davytimmers\LightspeedCli\Services\FileMetadataService;
-use Davytimmers\LightspeedCli\Services\MessageService;
+use ShopmonkeyNL\ShopmonkeyCli\Services\InputOutput;
+use ShopmonkeyNL\ShopmonkeyCli\Services\SettingsService;
+use ShopmonkeyNL\ShopmonkeyCli\Services\FileMetadataService;
+use ShopmonkeyNL\ShopmonkeyCli\Services\MessageService;
 
 class Pull extends Command
 {

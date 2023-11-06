@@ -1,9 +1,9 @@
 <?php
 
-namespace Davytimmers\LightspeedCli\Services;
+namespace ShopmonkeyNL\ShopmonkeyCli\Services;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Davytimmers\LightspeedCli\Services\InputOutput;
+use ShopmonkeyNL\ShopmonkeyCli\Services\InputOutput;
 
 class SettingsService
 {

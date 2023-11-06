@@ -1,6 +1,6 @@
 <?php
 
-namespace Davytimmers\LightspeedCli\Commands;
+namespace ShopmonkeyNL\ShopmonkeyCli\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
