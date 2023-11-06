@@ -6,7 +6,7 @@ module.exports = {
     sourcePaths: [
       './src/sass/*.scss'
     ],
-    exportPath: './assets/'
+    exportPath: './theme/assets/'
   },
   thirdParty: {
     sassOptions: {
