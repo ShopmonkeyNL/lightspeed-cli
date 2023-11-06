@@ -1,6 +1,6 @@
 const config = require('./gulp.config');
 const concat = require('gulp-concat');
-const autoprefixer = import('gulp-autoprefixer');
+const autoprefixer = require('gulp-autoprefixer');
 const del = require('del');
 const gulp = require('gulp');
 const watch = require('gulp-watch');

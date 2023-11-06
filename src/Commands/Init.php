@@ -1,13 +1,13 @@
 <?php
 
-namespace Davytimmers\LightspeedCli\Commands;
+namespace Shopmonkeynl\ShopmonkeyCli\Commands;
 
 use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Davytimmers\LightspeedCli\Services\SettingsService;
-use Davytimmers\LightspeedCli\Services\InputOutput;
+use Shopmonkeynl\ShopmonkeyCli\Services\SettingsService;
+use Shopmonkeynl\ShopmonkeyCli\Services\InputOutput;
 
 class Init extends Command
 {
@@ -128,7 +128,7 @@ class Init extends Command
             passthru('npm install -g pnpm');
 
             // Install necessary gulp packages & sass
-            passthru('pnpm install -D gulp gulp-exec gulp-watch gulp-sass gulp-concat gulp-autoprefixer del@6.1.1 gulp-uglifycss gulp-rename sass && pnpm install -g gulp-cli');
+            passthru('pnpm install -D gulp gulp-exec gulp-watch gulp-sass gulp-concat gulp-autoprefixer@8.0.0 del@6.1.1 gulp-uglifycss gulp-rename sass && pnpm install -g gulp-cli');
         } catch (Exception $e) {
             echo $e->getMessage();
         }

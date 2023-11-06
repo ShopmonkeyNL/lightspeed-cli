@@ -1,7 +1,7 @@
 <?php
 
-namespace Davytimmers\LightspeedCli\Services;
-use Davytimmers\LightspeedCli\Services\InputOutput;
+namespace Shopmonkeynl\ShopmonkeyCli\Services;
+use Shopmonkeynl\ShopmonkeyCli\Services\InputOutput;
 
 class FileMetadataService
 {

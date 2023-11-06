@@ -1,6 +1,6 @@
 <?php
 
-namespace Davytimmers\LightspeedCli\Services;
+namespace Shopmonkeynl\ShopmonkeyCli\Services;
 use function Termwind\render;
 
 class MessageService

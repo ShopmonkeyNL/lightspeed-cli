@@ -1,6 +1,6 @@
 <?php
 
-namespace Davytimmers\LightspeedCli\Services;
+namespace Shopmonkeynl\ShopmonkeyCli\Services;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
 

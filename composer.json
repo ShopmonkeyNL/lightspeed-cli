@@ -1,10 +1,10 @@
 {
-    "name": "davytimmers/lightspeed-cli",
+    "name": "shopmonkeynl/shopmonkey-cli",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Davytimmers\\LightspeedCli\\": "src/"
+            "Shopmonkeynl\\ShopmonkeyCli\\": "src/"
         }
     },
     "authors": [
