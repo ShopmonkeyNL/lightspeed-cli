@@ -55,7 +55,7 @@ gulp.task('sass', () => {
 
 gulp.task('raincs', () => {
     const altRegex = /<img\b(?![^>]*alt=)[^>]*>/;
-    const currentDirectory = './';
+    const currentDirectory = './theme';
     const filesAndDirs = fs.readdirSync(currentDirectory);
     const directories = filesAndDirs.filter(item => {
       return fs.statSync(path.join(currentDirectory, item)).isDirectory();
