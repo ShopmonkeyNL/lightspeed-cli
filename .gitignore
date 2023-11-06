@@ -1,2 +1,13 @@
-/vendor/
-composer.lock
+/.functions
+/.vscode
+/node_modules
+/config.json
+/files-metadata.json
+/.prettierrc.json
+/gulp.config.js
+/gulpfile.js
+/package.json
+/pnpm-lock.yaml
+/vendor
+/composer.lock
+/theme

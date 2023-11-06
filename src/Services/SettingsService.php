@@ -11,7 +11,7 @@ class SettingsService
     public $file;
 
     public function __construct() {
-        $this->file = getcwd() . '/lightspeed-settings.json';
+        $this->file = getcwd() . '/config.json';
     }
 
     public function get($input, $output) {
@@ -56,9 +56,12 @@ class SettingsService
         $csrf = $io->question('Enter current CSRF token');
         $backend_session_id = $io->question('Enter current backend session ID');
 
+        $parsed_url = parse_url($shop_url);
+        $base_url = $parsed_url['scheme'] . '://' . $parsed_url['host'] . '/';
+
         $settings =  [
             'theme_id' => $theme_id,
-            'shop_url' => $shop_url,
+            'shop_url' => $base_url,
             'csrf' => $csrf,
             'backend_session_id' => $backend_session_id     
         ];
@@ -69,8 +72,11 @@ class SettingsService
 
     }
 
-    public function authenticate($settings) {
+    public function authenticate($input, $output) {
         
+        $settings = $this->get($input, $output);
+        $io = new InputOutput($input, $output);
+
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
@@ -103,8 +109,14 @@ class SettingsService
         } else {
             $response = json_decode($response, true);
             if (isset($response['error'])) {
-                return false;
+                
+                $io->info("Please log in below");
+                // $io->info(json_encode($settings, JSON_PRETTY_PRINT));
+                $settings = $this->create($input, $output);
+                $this->authenticate($input, $output);
+
             } else {
+                $io->right("Authentication successful for '". $settings['shop_url'] ."'.");
                 return true;
             }
         }
