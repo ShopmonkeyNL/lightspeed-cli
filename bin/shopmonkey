@@ -9,10 +9,10 @@
 
     require sprintf('%s/vendor/autoload.php', $root);
 
-    use ShopmonkeyNL\ShopmonkeyCli\Commands\Pull;
-    use ShopmonkeyNL\ShopmonkeyCli\Commands\Watch;
-    use ShopmonkeyNL\ShopmonkeyCli\Commands\Auth;
-    use ShopmonkeyNL\ShopmonkeyCli\Commands\Init;
+    use Shopmonkeynl\ShopmonkeyCli\Commands\Pull;
+    use Shopmonkeynl\ShopmonkeyCli\Commands\Watch;
+    use Shopmonkeynl\ShopmonkeyCli\Commands\Auth;
+    use Shopmonkeynl\ShopmonkeyCli\Commands\Init;
     use Symfony\Component\Console\Application;
 
     $application = new Application();

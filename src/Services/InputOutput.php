@@ -1,6 +1,6 @@
 <?php
 
-namespace ShopmonkeyNL\ShopmonkeyCli\Services;
+namespace Shopmonkeynl\ShopmonkeyCli\Services;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
 

@@ -4,7 +4,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Davytimmers\\LightspeedCli\\": "src/"
+            "Shopmonkeynl\\ShopmonkeyCli\\": "src/"
         }
     },
     "authors": [

@@ -1,7 +1,7 @@
 <?php
 
-namespace ShopmonkeyNL\ShopmonkeyCli\Services;
-use ShopmonkeyNL\ShopmonkeyCli\Services\InputOutput;
+namespace Shopmonkeynl\ShopmonkeyCli\Services;
+use Shopmonkeynl\ShopmonkeyCli\Services\InputOutput;
 
 class FileMetadataService
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace ShopmonkeyNL\ShopmonkeyCli\Commands;
+namespace Shopmonkeynl\ShopmonkeyCli\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

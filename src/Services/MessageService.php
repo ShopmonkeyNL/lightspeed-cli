@@ -1,6 +1,6 @@
 <?php
 
-namespace ShopmonkeyNL\ShopmonkeyCli\Services;
+namespace Shopmonkeynl\ShopmonkeyCli\Services;
 use function Termwind\render;
 
 class MessageService

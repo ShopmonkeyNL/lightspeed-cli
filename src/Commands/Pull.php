@@ -1,14 +1,14 @@
 <?php
 
-namespace ShopmonkeyNL\ShopmonkeyCli\Commands;
+namespace Shopmonkeynl\ShopmonkeyCli\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use ShopmonkeyNL\ShopmonkeyCli\Services\InputOutput;
-use ShopmonkeyNL\ShopmonkeyCli\Services\SettingsService;
-use ShopmonkeyNL\ShopmonkeyCli\Services\FileMetadataService;
-use ShopmonkeyNL\ShopmonkeyCli\Services\MessageService;
+use Shopmonkeynl\ShopmonkeyCli\Services\InputOutput;
+use Shopmonkeynl\ShopmonkeyCli\Services\SettingsService;
+use Shopmonkeynl\ShopmonkeyCli\Services\FileMetadataService;
+use Shopmonkeynl\ShopmonkeyCli\Services\MessageService;
 
 class Pull extends Command
 {
