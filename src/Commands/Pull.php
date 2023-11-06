@@ -314,7 +314,7 @@ class Pull extends Command
             passthru('npm install -g pnpm');
 
             // Install necessary gulp packages & sass
-            passthru('pnpm install -D gulp gulp-exec gulp-watch gulp-sass gulp-concat gulp-autoprefixer del@6.1.1 gulp-uglifycss gulp-rename sass && pnpm install -g gulp-cli');
+            passthru('pnpm install -D gulp gulp-exec gulp-watch gulp-sass gulp-concat gulp-autoprefixer del@6.1.1 gulp-uglifycss sass fs path && pnpm install -g gulp-cli');
         } catch (Exception $e) {
             echo $e->getMessage();
         }

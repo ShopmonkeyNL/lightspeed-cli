@@ -1,10 +1,8 @@
 const config = require('./gulp.config');
 const concat = require('gulp-concat');
 const autoprefixer = require('gulp-autoprefixer');
-const del = require('del');
 const gulp = require('gulp');
 const watch = require('gulp-watch');
-const rename = require('gulp-rename');
 const sass = require('gulp-sass')(require('sass'));
 const uglifycss = require('gulp-uglifycss');
 const exec = require('gulp-exec');
@@ -78,4 +76,4 @@ gulp.task('raincs', () => {
             })
         });
     });
-})
+});
