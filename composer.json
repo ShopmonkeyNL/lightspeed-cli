@@ -20,13 +20,13 @@
         "nunomaduro/termwind": "^1.15",
         "spekulatius/phpscraper": "^2.0",
         "symfony/browser-kit": "^6.3",
-        "symfony/css-selector": "^6.3"
+        "symfony/css-selector": "^6.3",
+        "symfony/panther": "^2.1",
+        "dbrekelmans/bdi": "^1.1"
     },
     "bin": [
         "bin/shopmonkey"
     ],
     "require-dev": {
-        "symfony/panther": "^2.1",
-        "dbrekelmans/bdi": "^1.1"
     }
 }
