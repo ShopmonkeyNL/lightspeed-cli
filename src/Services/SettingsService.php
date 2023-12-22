@@ -132,7 +132,7 @@ class SettingsService
         $login_url = $base_url . 'admin/auth/login';
         $io->info('Logging in on: ' . $login_url);
 
-        $client = Client::createFirefoxClient(__DIR__ . '/../drivers/geckodriver');
+        $client = Client::createChromeClient();
         $client->request('GET', $login_url);
         $crawler = $client->waitFor('#form_auth_login');
 
