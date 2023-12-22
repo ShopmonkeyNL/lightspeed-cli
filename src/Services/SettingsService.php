@@ -135,6 +135,7 @@ class SettingsService
         $client = Client::createChromeClient();
         $client->request('GET', $login_url);
         $crawler = $client->waitFor('#form_auth_login');
+        $form = $crawler->filter('#form_auth_login')->form();
 
         $file = $this->file;
         if (file_exists($file)) {
@@ -156,10 +157,13 @@ class SettingsService
             passthru('security add-generic-password -a "' . $user . '" -s "shopmonkeycli" -w "' . $password . '" -U');
         }
 
-        $client->submitForm('Login', [
+        $form->setValues([
             'login[email]' => $user,
             'login[password]' => $password
         ]);
+
+        $client->submit($form);
+        $client->waitFor('.Sidebar');
 
         // $io->info($client->getCurrentURL() === $login_url);
         if ($client->getCurrentURL() === $login_url) {
